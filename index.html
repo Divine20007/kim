@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kim's Jar of Warm Thoughts ✨</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at 50% 20%, #2e1065, #0f172a, #030712);
+      color: #f8fafc;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .font-serif-title {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .font-handwriting {
+      font-family: 'Caveat', cursive;
+    }
+
+    #sparkleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 192, 203, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(236, 72, 153, 0.15), 0 0 40px 0 rgba(168, 85, 247, 0.1);
+    }
+
+    .glass-modal {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(244, 114, 182, 0.3);
+    }
+
+    /* Jar styling */
+    .jar-container {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(244, 114, 182, 0.3);
+      box-shadow: 0 0 35px rgba(244, 114, 182, 0.2), inset 0 0 25px rgba(255, 255, 255, 0.1);
+    }
+
+    .glow-button {
+      box-shadow: 0 0 20px rgba(244, 114, 182, 0.5), inset 0 0 10px rgba(244, 114, 182, 0.3);
+      transition: all 0.3s ease;
+    }
+    .glow-button:hover {
+      box-shadow: 0 0 30px rgba(244, 114, 182, 0.8), 0 0 50px rgba(168, 85, 247, 0.6);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .animate-pulse-slow {
+      animation: pulse-slow 3s ease-in-out infinite;
+    }
+
+    textarea::-webkit-scrollbar { width: 6px; }
+    textarea::-webkit-scrollbar-thumb {
+      background: rgba(244, 114, 182, 0.3);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen items-center justify-center p-4 relative select-none">
+
+  <!-- Interactive Sparkle Canvas Layer -->
+  <canvas id="sparkleCanvas"></canvas>
+
+  <!-- Sound Toggle Button -->
+  <button id="soundToggle" onclick="toggleAudio()" class="fixed top-5 right-5 z-20 px-4 py-2 rounded-full glass-card text-pink-200 hover:text-white flex items-center gap-2 text-xs sm:text-sm transition duration-300">
+    <i id="soundIcon" class="fas fa-music"></i>
+    <span id="soundText">Soft Music: Off</span>
+  </button>
+
+  <!-- Main Card Container -->
+  <main class="w-full max-w-xl z-20 my-auto">
+    <div class="glass-card rounded-3xl p-6 sm:p-10 text-center animate-float relative overflow-hidden">
+      
+      <!-- Ambient Glow Behind Header -->
+      <div class="absolute -top-20 -left-20 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Title -->
+      <h1 class="text-3xl sm:text-4xl font-serif-title font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-200 via-rose-100 to-purple-200 mb-2">
+        Kim's Jar of Warm Thoughts ✨
+      </h1>
+      <p class="text-xs sm:text-sm text-pink-200/70 tracking-widest uppercase mb-6 font-light">
+        Tap a note inside the jar to open a piece of my heart
+      </p>
+
+      <!-- Glass Jar Graphic Container -->
+      <div class="relative w-52 h-80 sm:w-60 sm:h-96 mx-auto mb-8 rounded-b-3xl rounded-t-xl jar-container flex flex-col justify-end p-4 gap-2 items-center overflow-hidden">
+        
+        <!-- Jar Lid -->
+        <div class="absolute -top-1 w-4/5 h-6 bg-pink-300/30 rounded-full border border-pink-200/40 shadow-inner"></div>
+
+        <!-- Floating Paper Notes in the Jar -->
+        <button onclick="openNoteModal(0)" class="w-36 py-1.5 px-3 rounded-xl bg-gradient-to-r from-pink-400/30 to-purple-400/30 border border-pink-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform -rotate-3 shadow-md flex items-center justify-between">
+          <span>Note #1 💌</span> <i class="fas fa-sparkles text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(1)" class="w-40 py-1.5 px-3 rounded-xl bg-gradient-to-r from-purple-400/30 to-rose-400/30 border border-purple-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform rotate-2 shadow-md flex items-center justify-between">
+          <span>Note #2 🌙</span> <i class="fas fa-heart text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(2)" class="w-36 py-1.5 px-3 rounded-xl bg-gradient-to-r from-rose-400/30 to-pink-400/30 border border-rose-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform -rotate-2 shadow-md flex items-center justify-between">
+          <span>Note #3 🌷</span> <i class="fas fa-star text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(3)" class="w-40 py-1.5 px-3 rounded-xl bg-gradient-to-r from-pink-400/30 to-purple-400/30 border border-pink-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform rotate-3 shadow-md flex items-center justify-between">
+          <span>Note #4 ✨</span> <i class="fas fa-cloud text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(4)" class="w-36 py-1.5 px-3 rounded-xl bg-gradient-to-r from-purple-400/30 to-rose-400/30 border border-purple-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform -rotate-1 shadow-md flex items-center justify-between">
+          <span>Note #5 🌌</span> <i class="fas fa-moon text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(5)" class="w-40 py-1.5 px-3 rounded-xl bg-gradient-to-r from-rose-400/30 to-pink-400/30 border border-rose-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform rotate-1 shadow-md flex items-center justify-between">
+          <span>Note #6 🕊️</span> <i class="fas fa-sun text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(6)" class="w-36 py-1.5 px-3 rounded-xl bg-gradient-to-r from-pink-400/30 to-purple-400/30 border border-pink-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform -rotate-2 shadow-md flex items-center justify-between">
+          <span>Note #7 💖</span> <i class="fas fa-smile text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(7)" class="w-40 py-1.5 px-3 rounded-xl bg-gradient-to-r from-purple-400/30 to-rose-400/30 border border-purple-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform rotate-2 shadow-md flex items-center justify-between">
+          <span>Note #8 🌿</span> <i class="fas fa-home text-xs text-pink-300"></i>
+        </button>
+        <button onclick="openNoteModal(8)" class="w-36 py-1.5 px-3 rounded-xl bg-gradient-to-r from-rose-400/30 to-pink-400/30 border border-rose-300/40 text-pink-100 font-handwriting text-lg hover:scale-105 transition transform -rotate-1 shadow-md flex items-center justify-between">
+          <span>Note #9 🌸</span> <i class="fas fa-magic text-xs text-pink-300"></i>
+        </button>
+
+      </div>
+
+      <!-- Action Button -->
+      <button onclick="openReplyModal()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold text-sm glow-button animate-pulse-slow flex items-center justify-center gap-2 mx-auto">
+        <i class="fas fa-paper-plane"></i>
+        <span>Send Me a Reply 💬</span>
+      </button>
+
+    </div>
+  </main>
+
+  <!-- Footer Credit -->
+  <footer class="z-20 text-center py-4 text-xs text-pink-200/40 font-light">
+    Made with infinite warmth &amp; sparkles for Kim ✨
+  </footer>
+
+  <!-- Note Unfold Modal Overlay -->
+  <div id="noteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="glass-modal rounded-3xl p-6 sm:p-8 w-full max-w-md transform scale-95 transition-transform duration-300 border border-pink-400/30 text-center relative shadow-2xl">
+      
+      <button onclick="closeNoteModal()" class="absolute top-4 right-4 text-pink-300/60 hover:text-pink-100 transition">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+
+      <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500/20 to-purple-500/20 text-pink-300 mx-auto flex items-center justify-center mb-4 border border-pink-300/30">
+        <i id="noteIcon" class="fas fa-heart text-xl"></i>
+      </div>
+
+      <h3 id="noteTitle" class="text-xl font-serif-title font-semibold text-pink-100 mb-4">Note Title</h3>
+
+      <div class="p-4 bg-black/20 rounded-2xl border border-white/5 mb-6">
+        <p id="noteBody" class="text-lg sm:text-xl font-handwriting text-pink-100 leading-relaxed tracking-wide"></p>
+      </div>
+
+      <button onclick="closeNoteModal()" class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-pink-200 text-xs font-semibold transition">
+        Put note back in jar ✨
+      </button>
+    </div>
+  </div>
+
+  <!-- Reply Modal Overlay -->
+  <div id="replyModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="glass-modal rounded-3xl p-6 sm:p-8 w-full max-w-md transform scale-95 transition-transform duration-300 border border-pink-400/30 text-center relative shadow-2xl">
+      
+      <button onclick="closeReplyModal()" class="absolute top-4 right-4 text-pink-300/60 hover:text-pink-100 transition">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+
+      <div class="w-12 h-12 rounded-full bg-pink-500/20 text-pink-300 mx-auto flex items-center justify-center mb-4">
+        <i class="fas fa-paper-plane text-xl"></i>
+      </div>
+
+      <h3 class="text-xl font-serif-title font-semibold text-pink-100 mb-1">Send your reply 💕</h3>
+      <p class="text-xs text-pink-200/60 mb-4">This will open Telegram to send your message directly to my DM!</p>
+
+      <textarea id="replyText" rows="4" placeholder="Type your sweet message to me..." class="w-full p-4 rounded-2xl bg-black/40 border border-pink-300/20 text-pink-100 placeholder-pink-300/30 text-sm focus:outline-none focus:border-pink-400 transition mb-4 resize-none"></textarea>
+
+      <button onclick="sendToTelegram()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold text-sm glow-button flex items-center justify-center gap-2">
+        <span>Open Telegram &amp; Send</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const telegramUsername = "qonnur";
+
+    const notesData = [
+      {
+        title: "Your Genuine Ear 🎧",
+        icon: "fa-heart",
+        text: "You don't just listen, you truly hear me. In a world full of noise, having someone like you who listens so attentively makes every word feel safe and valued."
+      },
+      {
+        title: "The Time You Give 🌙",
+        icon: "fa-moon",
+        text: "When you stay up late and trade your sweet sleep just to talk to me, it never goes unnoticed. Knowing you choose to make time for me is one of the warmest feelings in the world."
+      },
+      {
+        title: "Your Caring Heart 🕊️",
+        icon: "fa-hand-holding-heart",
+        text: "You have a gentle way of caring that makes everything feel lighter. The effort and tenderness you put into us means more to me than I can put into words."
+      },
+      {
+        title: "Why You're So Special 🌸",
+        icon: "fa-sparkles",
+        text: "You're special to me simply because I love you, Kim. It’s not complicated; just having you in my life makes every single day a whole lot brighter."
+      },
+      {
+        title: "Looking Forward To IRL 🌌",
+        icon: "fa-star",
+        text: "I count down to the day I finally get to see you in real life. I know it will definitely happen, and when it does, it's going to be the most wonderful moment."
+      },
+      {
+        title: "How Lovely You Are 🌷",
+        icon: "fa-sun",
+        text: "It’s so easy to see why people naturally care so deeply about you, Kim. You have this genuine, lovely warmth that just draws people in and brightens their world without you even trying."
+      },
+      {
+        title: "Your Magic Smile 💖",
+        icon: "fa-smile-beam",
+        text: "Every time I picture your smile, Kim, it instantly turns my whole day around. You have a brightness in you that makes everything feel ten times sweeter."
+      },
+      {
+        title: "My Safe Place 🌿",
+        icon: "fa-home",
+        text: "Talking to you feels like taking a deep breath of fresh air. No matter how crazy the day gets, you're the one place where I always feel completely at peace."
+      },
+      {
+        title: "All Your Cute Habits 🌸",
+        icon: "fa-wand-magic-sparkles",
+        text: "I adore every little quirk and detail about you; the way you express yourself, your sweet energy, and just the irreplaceable person you are. You're truly one of a kind."
+      }
+    ];
+
+    const noteModal = document.getElementById('noteModal');
+    const replyModal = document.getElementById('replyModal');
+
+    function openNoteModal(index) {
+      const data = notesData[index];
+      document.getElementById('noteTitle').textContent = data.title;
+      document.getElementById('noteBody').textContent = `"${data.text}"`;
+      document.getElementById('noteIcon').className = `fas ${data.icon} text-xl`;
+
+      noteModal.classList.remove('hidden');
+      setTimeout(() => {
+        noteModal.classList.remove('opacity-0');
+        noteModal.children[0].classList.remove('scale-95');
+      }, 10);
+      createSparkleBurst();
+      playSparkleSound();
+    }
+
+    function closeNoteModal() {
+      noteModal.classList.add('opacity-0');
+      noteModal.children[0].classList.add('scale-95');
+      setTimeout(() => {
+        noteModal.classList.add('hidden');
+      }, 300);
+    }
+
+    function openReplyModal() {
+      replyModal.classList.remove('hidden');
+      setTimeout(() => {
+        replyModal.classList.remove('opacity-0');
+        replyModal.children[0].classList.remove('scale-95');
+      }, 10);
+      createSparkleBurst();
+    }
+
+    function closeReplyModal() {
+      replyModal.classList.add('opacity-0');
+      replyModal.children[0].classList.add('scale-95');
+      setTimeout(() => {
+        replyModal.classList.add('hidden');
+      }, 300);
+    }
+
+    function sendToTelegram() {
+      const text = document.getElementById('replyText').value.trim();
+      const defaultText = "Hey! I just unrolled your jar of notes... 💕";
+      const encodedText = encodeURIComponent(text || defaultText);
+      const url = `https://t.me/${telegramUsername}?text=${encodedText}`;
+      
+      createSparkleBurst();
+      setTimeout(() => {
+        window.open(url, '_blank');
+      }, 300);
+    }
+
+    // Sparkles & Hearts Background System
+    const canvas = document.getElementById('sparkleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor(x, y, isHeart = false) {
+        this.x = x || Math.random() * canvas.width;
+        this.y = y || Math.random() * canvas.height;
+        this.size = Math.random() * (isHeart ? 14 : 3) + 1;
+        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.speedY = (Math.random() - 0.5) * 0.8 - (isHeart ? 0.5 : 0);
+        this.opacity = Math.random() * 0.7 + 0.3;
+        this.fade = Math.random() * 0.008 + 0.003;
+        this.isHeart = isHeart || Math.random() < 0.15;
+        this.color = `hsl(${Math.random() * 40 + 320}, 100%, 80%)`;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.opacity -= this.fade;
+
+        if (this.opacity <= 0) {
+          this.x = Math.random() * canvas.width;
+          this.y = canvas.height + 10;
+          this.opacity = Math.random() * 0.7 + 0.3;
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        
+        if (this.isHeart) {
+          ctx.beginPath();
+          const topCurveHeight = this.size * 0.3;
+          ctx.moveTo(this.x, this.y + topCurveHeight);
+          ctx.bezierCurveTo(this.x, this.y, this.x - this.size / 2, this.y, this.x - this.size / 2, this.y + topCurveHeight);
+          ctx.bezierCurveTo(this.x - this.size / 2, this.y + (this.size + topCurveHeight) / 2, this.x, this.y + this.size, this.x, this.y + this.size);
+          ctx.bezierCurveTo(this.x, this.y + this.size, this.x + this.size / 2, this.y + (this.size + topCurveHeight) / 2, this.x + this.size / 2, this.y + topCurveHeight);
+          ctx.bezierCurveTo(this.x + this.size / 2, this.y, this.x, this.y, this.x, this.y + topCurveHeight);
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = this.color;
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 65; i++) {
+      particles.push(new Particle());
+    }
+
+    function createSparkleBurst() {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      for (let i = 0; i < 25; i++) {
+        const p = new Particle(centerX + (Math.random() - 0.5) * 200, centerY + (Math.random() - 0.5) * 200, true);
+        p.speedY = -Math.random() * 2 - 1;
+        particles.push(p);
+      }
+    }
+
+    window.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA') return;
+      for (let i = 0; i < 8; i++) {
+        particles.push(new Particle(e.clientX, e.clientY));
+      }
+      playSparkleSound();
+    });
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, index) => {
+        p.update();
+        p.draw();
+        if (p.opacity <= 0) particles.splice(index, 1);
+      });
+
+      if (particles.length < 50) {
+        particles.push(new Particle());
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    // Web Audio Synthesized Chime Tones
+    let audioCtx = null;
+    let isAudioPlaying = false;
+    let ambientInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSparkleSound() {
+      if (!isAudioPlaying) return;
+      initAudio();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      const freq = freqs[Math.floor(Math.random() * freqs.length)];
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    }
+
+    function toggleAudio() {
+      isAudioPlaying = !isAudioPlaying;
+      const soundText = document.getElementById('soundText');
+      const soundIcon = document.getElementById('soundIcon');
+      
+      if (isAudioPlaying) {
+        initAudio();
+        soundText.textContent = "Soft Music: On";
+        soundIcon.className = "fas fa-volume-up text-pink-400";
+        ambientInterval = setInterval(() => {
+          if (isAudioPlaying) playSparkleSound();
+        }, 1800);
+        playSparkleSound();
+      } else {
+        soundText.textContent = "Soft Music: Off";
+        soundIcon.className = "fas fa-music";
+        clearInterval(ambientInterval);
+      }
+    }
+
+    window.onload = function() {
+      animateParticles();
+    };
+  </script>
+</body>
+</html>
